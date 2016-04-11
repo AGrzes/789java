@@ -1,20 +1,47 @@
 package org.example.java8.optional;
 
+import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 public class Example {
+    public static boolean test() {
+        return new Date().getTime() % 4 != 0;
+    }
+
+    public static String generate() {
+        if (test()) {
+            return "Foo";
+        }
+        return null;
+    }
+
+    public static String transform(String s) {
+        if (test()) {
+            return s.toUpperCase();
+        }
+        return null;
+    }
+
+    public static void before() {
+        String s = generate();
+        if (s != null) {
+            s = transform(s);
+            if (s != null) {
+                if (s.charAt(1) == 'O') {
+                    System.out.println(s);
+                }
+            }
+        }
+    }
+
+    public static void after() {
+        Optional<String> os = Optional.ofNullable(generate());
+        os.map(Example::transform).filter((s) -> s.charAt(1) == 'O').ifPresent(System.out::println);
+    }
 
     public static void main(String[] args) {
-        Optional<String> os = Optional.of("Foo");
-        System.out.println(os.get());
-        os.map((s) -> s.toUpperCase()).filter((s) -> s.charAt(1) == 'O').ifPresent(System.out::println);
-        System.out.println(os.map((s) -> s.toUpperCase()).filter((s) -> s.charAt(1) == 'o').orElse("Bar"));
-        try {
-            os.filter((s) -> s.charAt(1) == 'O').flatMap(Optional::ofNullable).orElseThrow(NullPointerException::new);
-        } catch (NullPointerException e) {
-            System.out.println(os.filter((s) -> s.charAt(1) == 'O').flatMap(Optional::ofNullable).orElseGet(() -> UUID.randomUUID().toString()));
-        }
+        before();
+        after();
     }
 
 }
